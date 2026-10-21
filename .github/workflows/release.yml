@@ -1,0 +1,66 @@
+# Release for one official plugin repository: push a tag such as v1.2.3.
+# This workflow builds and publishes a GitHub Release, then notifies the main repository. It never touches the catalog
+# signing key or the R2 bucket: the catalog is signed and published by the main repository's publish-plugin workflow.
+name: release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: read
+env:
+  PLUGIN_ID: trakt
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    # Secrets used while building (for example an API key compiled into the binary) live in the "production"
+    # environment, which only v* tags may use, so no branch workflow can read them.
+    environment: production
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with: { go-version-file: go.mod }
+      - name: Tag must match VERSION
+        run: test "${GITHUB_REF_NAME}" = "v$(tr -d '[:space:]' < VERSION)"
+      - run: go vet ./... && go test -race -count=1 ./...
+      - name: Build and package
+        env:
+          APP_KEY: ${{ secrets.TRAKT_CLIENT_ID }}
+          APP_SECRET: ${{ secrets.TRAKT_CLIENT_SECRET }}
+          APP_KEY_REQUIRED: "1"
+        run: bash .github/scripts/package.sh "${GITHUB_REF_NAME#v}"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: packages
+          path: dist/*
+          if-no-files-found: error
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: packages
+          path: dist
+      - uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
+        with:
+          files: dist/*
+          fail_on_unmatched_files: true
+  notify:
+    needs: publish
+    runs-on: ubuntu-24.04
+    environment: production
+    steps:
+      # PLUGIN_DISPATCH_TOKEN (environment "production"): a fine-grained token for the main repository with
+      # Actions read and write only. It can start the publish-plugin workflow but cannot read or push code.
+      - name: Notify the main repository
+        env:
+          TOKEN: ${{ secrets.PLUGIN_DISPATCH_TOKEN }}
+          MAIN_REPO: ${{ vars.MAIN_REPO }}
+        run: |
+          curl -fsS --retry 3 --retry-all-errors --retry-delay 10 -X POST "https://api.github.com/repos/${MAIN_REPO}/actions/workflows/publish-plugin.yml/dispatches" \
+            -H "Authorization: Bearer ${TOKEN}" -H "Accept: application/vnd.github+json" \
+            -d "{\"ref\":\"main\",\"inputs\":{\"plugin\":\"${PLUGIN_ID}\",\"version\":\"${GITHUB_REF_NAME#v}\",\"repository\":\"${GITHUB_REPOSITORY}\"}}"

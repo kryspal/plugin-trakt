@@ -1,0 +1,16 @@
+{
+  "name": "Trakt",
+  "nameI18n": {
+    "zh-TW": "Trakt",
+    "zh-CN": "Trakt"
+  },
+  "description": "Links each member's own Trakt account: reports what they watch, imports their watched history and sends what was watched here.",
+  "descriptionI18n": {
+    "zh-TW": "連結每位成員自己的 Trakt 帳號：回報正在觀看的內容、匯入已看紀錄，並送出在這裡看過的紀錄。",
+    "zh-CN": "连接每位成员自己的 Trakt 账号：汇报正在观看的内容、导入已看记录，并发送在这里看过的记录。"
+  },
+  "owner": "Kryspal Media",
+  "minServer": "0.9.9",
+  "homepage": "https://github.com/kryspal/plugin-trakt",
+  "capabilities": ["usersync.link", "usersync.scrobble", "usersync.watched.pull", "usersync.watched.push"]
+}
