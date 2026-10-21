@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	_ "embed"
+	"encoding/base64"
 	"net/url"
 	"strings"
 	"sync"
@@ -18,7 +19,7 @@ const (
 	keyClientSecret = "client_secret"
 	keyBaseURL      = "base_url"
 
-	attributionText = "Watch history sync by Trakt"
+	attributionText = "Powered by Trakt"
 	attributionLink = "https://trakt.tv"
 )
 
@@ -33,6 +34,14 @@ var (
 	appKey    string
 	appSecret string
 )
+
+// logoSVG is the official Trakt "Full Logo" for light backgrounds, exactly as downloaded from https://app.trakt.tv/branding (not modified: Trakt's
+// branding rules forbid changing, recoloring or redrawing it). The server shows source logos on a light plate.
+//
+//go:embed logo/trakt-logo.svg
+var logoSVG []byte
+
+var logoDataURI = "data:image/svg+xml;base64," + base64.StdEncoding.EncodeToString(logoSVG)
 
 // versionFile is the single source of the plugin version: the manifest's version.
 //
@@ -89,7 +98,7 @@ func (p *plugin) Describe(_ context.Context, req *pluginv1.DescribeRequest) (*pl
 			{Key: keyBaseURL, Type: pluginv1.ConfigFieldType_CONFIG_FIELD_TYPE_STRING, Group: "advanced", Label: t.T("baseURLLabel"),
 				Description: t.T("baseURLHelp"), Placeholder: defaultBaseURL},
 		},
-		Attribution:          &pluginv1.Attribution{Text: attributionText, Link: attributionLink},
+		Attribution:          &pluginv1.Attribution{Text: attributionText, LogoUrl: logoDataURI, Link: attributionLink},
 		SuggestedConcurrency: 2,
 	}, nil
 }

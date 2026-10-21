@@ -390,3 +390,17 @@ func TestWithoutAnyApplicationTheCallsNeedConfiguration(t *testing.T) {
 		t.Fatalf("code = %v (%v)", code(err), err)
 	}
 }
+
+func TestAttributionCarriesTheUnmodifiedLogo(t *testing.T) {
+	m, err := newPlugin().Describe(t.Context(), &pluginv1.DescribeRequest{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	a := m.GetAttribution()
+	if a.GetText() != "Powered by Trakt" || a.GetLink() != "https://trakt.tv" || !strings.HasPrefix(a.GetLogoUrl(), "data:image/svg+xml;base64,") {
+		t.Fatalf("attribution = %+v", a)
+	}
+	if !strings.Contains(string(logoSVG), "<svg") || strings.Contains(string(logoSVG), "<script") {
+		t.Fatal("the embedded logo is not a plain SVG")
+	}
+}

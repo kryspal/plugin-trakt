@@ -23,6 +23,6 @@ The plugin keeps no state. The server stores each member's credentials, encrypte
 
 Implementation notes: [docs/design.md](docs/design.md).
 
-Licensed under the Apache License 2.0 (see `LICENSE` and `NOTICE`). Trakt is a trademark of its owner; this plugin is not made or endorsed by Trakt.
+Licensed under the Apache License 2.0 (see `LICENSE` and `NOTICE`). The Trakt logo in `logo/` is a Trakt brand asset from [app.trakt.tv/branding](https://app.trakt.tv/branding), used unmodified and not covered by that license. Trakt is a trademark of its owner; this plugin is not made or endorsed by Trakt.
 
 Official builds are signed and published through the Kryspal plugin catalog; builds from source are treated as third-party plugins.
