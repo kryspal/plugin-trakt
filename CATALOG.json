@@ -10,7 +10,7 @@
     "zh-CN": "连接每位成员自己的 Trakt 账号：汇报正在观看的内容、导入已看记录，并发送在这里看过的记录。"
   },
   "owner": "Kryspal Media",
-  "minServer": "0.9.9",
+  "minServer": "0.9.8",
   "homepage": "https://github.com/kryspal/plugin-trakt",
   "capabilities": ["usersync.link", "usersync.scrobble", "usersync.watched.pull", "usersync.watched.push"]
 }
