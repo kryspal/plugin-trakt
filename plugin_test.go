@@ -42,7 +42,7 @@ func newFake(t *testing.T, h func(w http.ResponseWriter, r *http.Request, body s
 	}))
 	t.Cleanup(srv.Close)
 	p := newPlugin()
-	p.api.base, p.api.interval = srv.URL, 0
+	p.api.base, p.api.interval, p.api.getEvery = srv.URL, 0, 0
 	p.set = settings{clientID: "cid", clientSecret: "sec"}
 	return p, f
 }
@@ -379,8 +379,8 @@ func TestConfigureAndDescribe(t *testing.T) {
 		}
 	}
 	m, err := p.Describe(ctx, &pluginv1.DescribeRequest{Language: "zh-CN"})
-	if err != nil || m.Id != "trakt" || len(m.Capabilities) != 4 || m.Attribution.GetText() == "" {
-		t.Fatalf("manifest = %+v %v", m, err)
+	if err != nil || m.Id != "trakt" || len(m.Capabilities) != 6 || m.Attribution.GetText() == "" || len(m.RatingSources) != 1 || m.RatingSources[0] != "trakt" {
+		t.Fatalf("manifest: id %q, capabilities %v, rating sources %v, err %v", m.GetId(), m.GetCapabilities(), m.GetRatingSources(), err)
 	}
 }
 
@@ -397,7 +397,7 @@ func TestAttributionCarriesTheUnmodifiedLogo(t *testing.T) {
 		t.Fatal(err)
 	}
 	a := m.GetAttribution()
-	if a.GetText() != "Powered by Trakt" || a.GetLink() != "https://trakt.tv" || !strings.HasPrefix(a.GetLogoUrl(), "data:image/svg+xml;base64,") {
+	if a.GetText() != "Kryspal Media uses Trakt but is not endorsed or certified by Trakt" || a.GetLink() != "https://trakt.tv" || !strings.HasPrefix(a.GetLogoUrl(), "data:image/svg+xml;base64,") {
 		t.Fatalf("attribution = %+v", a)
 	}
 	if !strings.Contains(string(logoSVG), "<svg") || strings.Contains(string(logoSVG), "<script") {

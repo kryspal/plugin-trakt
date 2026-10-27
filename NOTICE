@@ -4,7 +4,7 @@ Copyright 2026 The Kryspal Authors
 This plugin is licensed under the Apache License 2.0 (see LICENSE). It includes or links the third-party components
 below; each is licensed under its own license, which applies only to that component.
 
-The Trakt logo (logo/trakt-logo.svg) is a Trakt brand asset. It is NOT covered by the Apache License 2.0; it is used under the Trakt
+The Trakt logo (logo/trakt-circlemark.svg) is a Trakt brand asset. It is NOT covered by the Apache License 2.0; it is used under the Trakt
 branding requirements (https://app.trakt.tv/branding): it is not modified, not used as part of this plugin's own logo, and does not imply
 endorsement by Trakt.
 

@@ -8,7 +8,7 @@ var messages = i18n.New(messageTables)
 
 var messageTables = map[string]map[string]string{
 	"en": {
-		"desc":             "Links each member's own Trakt account. While a member watches, the server reports the title to Trakt; it can also import what the member has watched on Trakt and send what was watched here. Only items with a TMDB, IMDb or TVDB number are sent. Members link their account in their own settings.",
+		"desc":             "Each member links their own Trakt account to report what they watch and sync watched history. Also adds the Trakt community rating to movies and series.",
 		"groupAdvanced":    "Advanced",
 		"idLabel":          "Trakt application client ID",
 		"idHelp":           "Leave empty to use the built-in application. Fill it only to use an application you registered yourself on Trakt.",
@@ -22,7 +22,7 @@ var messageTables = map[string]map[string]string{
 		"errHTTPS":         "Must be an https:// address.",
 	},
 	"zh-TW": {
-		"desc":             "連結每位成員自己的 Trakt 帳號。成員觀看時，伺服器會把正在看的片名回報給 Trakt；也可以匯入成員在 Trakt 上的已看紀錄，並送出在這裡看過的紀錄。只送有 TMDB、IMDb 或 TVDB 編號的項目。成員在自己的設定裡連結帳號。",
+		"desc":             "每位成員連結自己的 Trakt 帳號，回報正在觀看的內容並同步已看紀錄。另外為電影和劇集加上 Trakt 社群評分。",
 		"groupAdvanced":    "進階",
 		"idLabel":          "Trakt 應用程式 Client ID",
 		"idHelp":           "留空表示使用內建的應用程式。只有要用你自己在 Trakt 註冊的應用程式時才填。",
@@ -36,7 +36,7 @@ var messageTables = map[string]map[string]string{
 		"errHTTPS":         "必須是 https:// 網址。",
 	},
 	"zh-CN": {
-		"desc":             "连接每位成员自己的 Trakt 账号。成员观看时，服务器会把正在看的片名汇报给 Trakt；也可以导入成员在 Trakt 上的已看记录，并发送在这里看过的记录。只发送有 TMDB、IMDb 或 TVDB 编号的项目。成员在自己的设置里连接账号。",
+		"desc":             "每位成员连接自己的 Trakt 账号，汇报正在观看的内容并同步已看记录。另外为电影和剧集加上 Trakt 社群评分。",
 		"groupAdvanced":    "高级",
 		"idLabel":          "Trakt 应用 Client ID",
 		"idHelp":           "留空表示使用内置的应用。只有要用你自己在 Trakt 注册的应用时才填。",

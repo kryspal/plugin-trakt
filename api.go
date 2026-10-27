@@ -36,7 +36,9 @@ const (
 	maxResponseBytes = 8 << 20
 	requestTimeout   = 30 * time.Second
 	minInterval      = 1100 * time.Millisecond
-	defaultRetry     = 30 * time.Second
+	// getInterval spaces the public GET requests (rating lookups): Trakt allows 500 per client ID and address in 5 minutes, about 100 a minute.
+	getInterval  = 700 * time.Millisecond
+	defaultRetry = 30 * time.Second
 )
 
 // api is the HTTP client: one request at a time, at least interval apart.
@@ -44,12 +46,13 @@ type api struct {
 	http     *http.Client
 	base     string
 	interval time.Duration
+	getEvery time.Duration // for a GET without a member token
 	mu       sync.Mutex
 	last     time.Time
 }
 
 func newAPI() *api {
-	return &api{http: &http.Client{Timeout: requestTimeout}, base: defaultBaseURL, interval: minInterval}
+	return &api{http: &http.Client{Timeout: requestTimeout}, base: defaultBaseURL, interval: minInterval, getEvery: getInterval}
 }
 
 type reply struct {
@@ -64,8 +67,8 @@ func (a *api) setBase(base string) {
 	a.mu.Unlock()
 }
 
-func (a *api) wait(ctx context.Context) error {
-	if d := time.Until(a.last.Add(a.interval)); d > 0 {
+func (a *api) wait(ctx context.Context, every time.Duration) error {
+	if d := time.Until(a.last.Add(every)); d > 0 {
 		t := time.NewTimer(d)
 		select {
 		case <-t.C:
@@ -83,7 +86,11 @@ func (a *api) wait(ctx context.Context) error {
 func (a *api) do(ctx context.Context, method, path, clientID, token string, query url.Values, body any) (reply, error) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
-	if err := a.wait(ctx); err != nil {
+	every := a.interval
+	if method == http.MethodGet && token == "" {
+		every = a.getEvery
+	}
+	if err := a.wait(ctx, every); err != nil {
 		return reply{}, err
 	}
 	var rd io.Reader

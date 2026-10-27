@@ -4,13 +4,20 @@
     "zh-TW": "Trakt",
     "zh-CN": "Trakt"
   },
-  "description": "Links each member's own Trakt account: reports what they watch, imports their watched history and sends what was watched here.",
+  "description": "Each member links their own Trakt account to report what they watch and sync watched history. Also adds the Trakt community rating to movies and series.",
   "descriptionI18n": {
-    "zh-TW": "連結每位成員自己的 Trakt 帳號：回報正在觀看的內容、匯入已看紀錄，並送出在這裡看過的紀錄。",
-    "zh-CN": "连接每位成员自己的 Trakt 账号：汇报正在观看的内容、导入已看记录，并发送在这里看过的记录。"
+    "zh-TW": "每位成員連結自己的 Trakt 帳號，回報正在觀看的內容並同步已看紀錄。另外為電影和劇集加上 Trakt 社群評分。",
+    "zh-CN": "每位成员连接自己的 Trakt 账号，汇报正在观看的内容并同步已看记录。另外为电影和剧集加上 Trakt 社群评分。"
   },
   "owner": "Kryspal Media",
-  "minServer": "0.9.8",
+  "minServer": "0.9.11",
   "homepage": "https://github.com/kryspal/plugin-trakt",
-  "capabilities": ["usersync.link", "usersync.scrobble", "usersync.watched.pull", "usersync.watched.push"]
+  "capabilities": [
+    "usersync.link",
+    "usersync.scrobble",
+    "usersync.watched.pull",
+    "usersync.watched.push",
+    "ratings.movie",
+    "ratings.series"
+  ]
 }

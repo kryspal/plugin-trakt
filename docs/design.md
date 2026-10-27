@@ -23,3 +23,14 @@ The client ID and secret come from the build (`-X main.appKey`, `-X main.appSecr
 ## Requests
 
 One request at a time, at least 1.1 seconds apart (Trakt allows about one write per second). A recognizable User-Agent and the client ID go on every request. Terms followed: only documented methods, no scraping, no extra applications to get around limits.
+
+## Ratings
+
+`GetRatings` (capabilities `ratings.movie` and `ratings.series`, rating source `trakt`) adds Trakt's community rating to an item another plugin matched. Verified against the live API on 2026-10-25.
+
+- With a TMDB number: `GET /search/tmdb/{id}?type=movie|show&extended=full`, one request that returns `rating`, `votes` and the IDs. The hit counts only when its type and TMDB number are the ones asked for and, when the item also has an IMDb number, Trakt's IMDb number agrees. An unknown number is a 200 with an empty array.
+- With only an IMDb number: `GET /movies|shows/{imdb}/ratings`. A bare number there is read as a Trakt ID and answers an unrelated title, so only `tt` plus digits is ever sent, never a TMDB number.
+- No other numbers, no name search, no `extended=all` (those are other sites' ratings). No votes means no rating. 404 is "nothing to say".
+- 429 is a plugin-wide `RateLimited` with Trakt's `Retry-After`; 401 and 403 mean the application is refused (`NeedsConfiguration`); 5xx and network errors are `UNAVAILABLE`.
+- In-memory cache, seven days, at most 20000 entries (a missing rating is cached too, a failed call is not). Public lookups are 0.7 seconds apart, about 85 a minute against Trakt's 500 per five minutes for one client ID and address.
+- The application is the same one the account sync uses; own client IDs from the advanced settings work for ratings too.

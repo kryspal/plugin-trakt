@@ -19,7 +19,8 @@ const (
 	keyClientSecret = "client_secret"
 	keyBaseURL      = "base_url"
 
-	attributionText = "Powered by Trakt"
+	// attributionText is the sentence Trakt's API Use Policy asks for in an app's About or settings page.
+	attributionText = "Kryspal Media uses Trakt but is not endorsed or certified by Trakt"
 	attributionLink = "https://trakt.tv"
 )
 
@@ -35,10 +36,11 @@ var (
 	appSecret string
 )
 
-// logoSVG is the official Trakt "Full Logo" for light backgrounds, exactly as downloaded from https://app.trakt.tv/branding (not modified: Trakt's
-// branding rules forbid changing, recoloring or redrawing it). The server shows source logos on a light plate.
+// logoSVG is the official Trakt "Circle Mark", exactly as downloaded from https://app.trakt.tv/branding (not modified: Trakt's branding rules forbid
+// changing, recoloring or redrawing it). It is square because the server shows a source logo in a small square, for example next to the member's
+// linked account.
 //
-//go:embed logo/trakt-logo.svg
+//go:embed logo/trakt-circlemark.svg
 var logoSVG []byte
 
 var logoDataURI = "data:image/svg+xml;base64," + base64.StdEncoding.EncodeToString(logoSVG)
@@ -73,15 +75,17 @@ func (s settings) secret() string {
 type plugin struct {
 	pluginv1.UnimplementedPluginServer
 	pluginv1.UnimplementedUserSyncServer
+	pluginv1.UnimplementedRatingProviderServer
 
-	mu  sync.Mutex
-	set settings
-	api *api // replaceable in tests
+	mu      sync.Mutex
+	set     settings
+	api     *api // replaceable in tests
+	ratings *ratingCache
 }
 
-func newPlugin() *plugin { return &plugin{api: newAPI()} }
+func newPlugin() *plugin { return &plugin{api: newAPI(), ratings: newRatingCache()} }
 
-// Describe declares the four user sync capabilities. There is no account setting: each member links their own account in the server's interface.
+// Describe declares the four user sync capabilities and the two rating capabilities. There is no account setting: each member links their own account in the server's interface.
 func (p *plugin) Describe(_ context.Context, req *pluginv1.DescribeRequest) (*pluginv1.Manifest, error) {
 	t := messages.For(req.GetLanguage())
 	return &pluginv1.Manifest{
@@ -89,8 +93,10 @@ func (p *plugin) Describe(_ context.Context, req *pluginv1.DescribeRequest) (*pl
 		Capabilities: []string{
 			pluginv1.CapabilityUserSyncLink, pluginv1.CapabilityUserSyncScrobble,
 			pluginv1.CapabilityUserSyncWatchedPull, pluginv1.CapabilityUserSyncWatchedPush,
+			pluginv1.CapabilityRatingsMovie, pluginv1.CapabilityRatingsSeries,
 		},
-		ConfigGroups: []*pluginv1.ConfigGroup{{Key: "advanced", Title: t.T("groupAdvanced")}},
+		RatingSources: []string{ratingSource},
+		ConfigGroups:  []*pluginv1.ConfigGroup{{Key: "advanced", Title: t.T("groupAdvanced")}},
 		ConfigFields: []*pluginv1.ConfigField{
 			{Key: keyClientID, Type: pluginv1.ConfigFieldType_CONFIG_FIELD_TYPE_STRING, Group: "advanced", Required: appKey == "", Label: t.T("idLabel"), Description: t.T("idHelp"),
 				Link: "https://trakt.tv/oauth/applications", LinkLabel: t.T("idLink")},

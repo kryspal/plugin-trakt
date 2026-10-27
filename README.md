@@ -1,6 +1,6 @@
 # plugin-trakt
 
-Links each member's own Trakt account: reports what they watch, imports their watched history and sends what was watched on the server. An official [Kryspal Media](https://github.com/kryspal) plugin, built on [plugin-sdk](https://github.com/kryspal/plugin-sdk).
+Links each member's own Trakt account: reports what they watch, imports their watched history and sends what was watched on the server. An official [Kryspal Media](https://github.com/kryspal) plugin, built on [plugin-sdk](https://github.com/kryspal/plugin-sdk). Needs Kryspal Media server 0.9.11 or newer.
 
 ```sh
 go build -o trakt .
@@ -14,6 +14,11 @@ go vet ./... && go test ./...
 - **Pull**: the watched history is read in pages. Later pulls read only what was watched after the last one.
 - **Push**: items watched on the server are marked as watched on Trakt, with the time they were watched.
 - Only items with a TMDB, IMDb or TVDB number are sent or matched. Nothing is ever marked as unwatched.
+- **Ratings** (`ratings.movie`, `ratings.series`; needs server 0.9.11 or newer): adds Trakt's community rating and vote count to movies and series that another plugin has already matched. The plugin looks the item up by its TMDB number (one request), or by its IMDb number when there is no TMDB number; it never searches by name and never reads other sites' ratings from Trakt. Answers are kept in memory for seven days. New libraries have every rating plugin ticked by default; for an existing library, open the library settings and tick Trakt under "Rating sources".
+
+## Attribution
+
+Kryspal Media uses Trakt but is not endorsed or certified by Trakt. Rating data comes from the public Trakt API under the [Trakt API Use Policy](https://github.com/trakt/trakt-api/blob/master/projects/developer/src/lib/guides/api-use-policy.md).
 
 ## Settings
 
